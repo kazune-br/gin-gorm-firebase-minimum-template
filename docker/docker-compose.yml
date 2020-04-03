@@ -1,0 +1,53 @@
+version: '3'
+services:
+  sample-api:
+    image: sample-api:latest
+    build:
+      context: ../
+      dockerfile: "docker/Dockerfile"
+      args:
+        API_PORT: ${API_PORT}
+    expose:
+      - "${API_PORT}"
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    environment:
+      ENV: ${ENV}
+      APP_PORT: ${API_PORT}
+      DB_NAME: sample
+      DB_USER: sample
+      DB_PASS: password
+      DB_HOST: sample-api-db
+      DB_PORT: 3306
+      FIREBASE_JSON: ${FIREBASE_JSON}
+    command: sh -c 'envsubst < ./dbconfig.yml.tpl > ./dbconfig.yml && ./app'
+    container_name: sample-api
+    depends_on:
+      - sample-api-db
+    volumes:
+      - ../scripts:/app/scripts
+      - ../db/migrations:/app/db/migrations
+
+  sample-api-swagger-ui:
+    image: swaggerapi/swagger-ui:latest
+    container_name: sample-api-swagger-ui
+    ports:
+      - 90:8080
+    volumes:
+      - ../swagger/swagger.yaml:/swagger.yaml
+    environment:
+      SWAGGER_JSON: /swagger.yaml
+
+  sample-api-db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: sample
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: sample
+      MYSQL_PASSWORD: password
+    ports:
+      - ${EXTERNAL_DB_PORT}:3306
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    volumes:
+      - ../db/mysql_data:/var/lib/mysql
+    container_name: sample-api-db

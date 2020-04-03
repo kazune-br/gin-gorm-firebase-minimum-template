@@ -1,0 +1,30 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Sample API
+servers:
+  - url: http://localhost:{port}{basePath}
+    description: Development
+    variables:
+      port:
+        default: "4001"
+      basePath:
+        default: /api
+
+tags:
+  - name: "v1"
+
+  /healthcheck:
+    get:
+      tags:
+        - v1
+      summary: HealthCheck
+      responses:
+        200:
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                message: health check passed
