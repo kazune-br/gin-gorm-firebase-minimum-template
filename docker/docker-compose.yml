@@ -19,7 +19,7 @@ services:
       DB_PASS: password
       DB_HOST: sample-api-db
       DB_PORT: 3306
-      FIREBASE_JSON: ${FIREBASE_JSON}
+      FIREBASE_JSON64: ${FIREBASE_JSON64}
     command: sh -c 'envsubst < ./dbconfig.yml.tpl > ./dbconfig.yml && ./app'
     container_name: sample-api
     depends_on:

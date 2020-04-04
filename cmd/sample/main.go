@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net/http"
@@ -21,10 +22,17 @@ func main() {
 	configuration.Load()
 	ctx := context.Background()
 
-	// initialize firebase app
-	credentials, err := google.CredentialsFromJSON(ctx, []byte(configuration.Get().FireBaseJson))
+	// decode firebase service key encoded as base64
+	bytes, err := base64.StdEncoding.DecodeString(configuration.Get().FireBaseJson64)
 	if err != nil {
-		log.Println("failed to read firebase service key")
+		log.Println("decoding firebase service key failed")
+		panic(err)
+	}
+
+	// initialize firebase app
+	credentials, err := google.CredentialsFromJSON(ctx, bytes)
+	if err != nil {
+		log.Println("failed to create credentials from firebase keys embedded in environment variable")
 		panic(err)
 	}
 	opt := option.WithCredentials(credentials)
